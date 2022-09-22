@@ -1,0 +1,11 @@
+Model Information:
+* title:	Low Poly Simple House
+* source:	https://sketchfab.com/3d-models/low-poly-simple-house-6a62234713884ef99d95803d7590d183
+* author:	chroma3d (https://sketchfab.com/vendol21)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Low Poly Simple House" (https://sketchfab.com/3d-models/low-poly-simple-house-6a62234713884ef99d95803d7590d183) by chroma3d (https://sketchfab.com/vendol21) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
