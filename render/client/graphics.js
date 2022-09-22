@@ -8,12 +8,19 @@ renderer,
 scene,
 camera,
 mesh,
+vertexShader,
+fragmentShader,
 textureLoader = new THREE.TextureLoader(),
 material,
 start = Date.now(),
 fov = 30;
 
-window.addEventListener( 'load', function() {
+async function load_shaders() {
+    vertexShader = await fetch('vertex_shader.glsl').then(result => result.text());
+    fragmentShader = await fetch('fragment_shader.glsl').then(result => result.text());
+}
+
+function init() {
 
     container = document.getElementById( "container" );
 
@@ -39,8 +46,8 @@ window.addEventListener( 'load', function() {
             value: 0.0
             }
         },
-        vertexShader: document.getElementById( 'vertexShader' ).textContent,
-        fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+        vertexShader: vertexShader,
+        fragmentShader: fragmentShader
 
     } );
 
@@ -62,8 +69,11 @@ window.addEventListener( 'load', function() {
     window.addEventListener( 'resize', onWindowResize );
 
     render();
+}
 
-} );
+window.addEventListener( 'load', function() {
+    load_shaders().then(init);
+});
 
 function onWindowResize () {
 
