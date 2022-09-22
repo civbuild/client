@@ -68,7 +68,7 @@ async function init() {
 
     const controls = new OrbitControls( camera, renderer.domElement );
     controls.maxPolarAngle = 0.9 * Math.PI / 2;
-    controls.enableZoom = true;
+    controls.enableZoom = false;
 
     // MODEL
 
