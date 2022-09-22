@@ -1,103 +1,83 @@
 
-import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import * as THREE from 'three'
+import { OrbitControls } from "https://threejs.org/examples/jsm/controls/OrbitControls.js";
 
-const SCREEN_WIDTH = window.innerWidth;
-const SCREEN_HEIGHT = window.innerHeight;
+var
+container,
+renderer,
+scene,
+camera,
+mesh,
+textureLoader = new THREE.TextureLoader(),
+material,
+start = Date.now(),
+fov = 30;
 
-let container, stats;
-let camera, scene, renderer;
+window.addEventListener( 'load', function() {
 
-await init();
-animate();
-
-async function init() {
-
-    container = document.createElement( 'div' );
-    document.body.appendChild( container );
-
-    // CAMERA
-
-    camera = new THREE.PerspectiveCamera( 40, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
-    camera.position.set( 500, 1000, - 500 );
-
-    // SCENE
+    container = document.getElementById( "container" );
 
     scene = new THREE.Scene();
 
-    // LIGHTS
+    camera = new THREE.PerspectiveCamera(
+        fov,
+        window.innerWidth / window.innerHeight,
+        1,
+        10000 );
+    camera.position.z = 100;
 
-    const light = new THREE.DirectionalLight( 0xaabbff, 0.3 );
-    light.position.x = 300;
-    light.position.y = 250;
-    light.position.z = - 500;
-    scene.add( light );
 
-    // SKYDOME
+    material = new THREE.ShaderMaterial( {
 
-    const vertexShader = document.getElementById( 'vertexShader' ).textContent;
-    const fragmentShader = document.getElementById( 'fragmentShader' ).textContent;
-    const uniforms = {
-        topColor: { value: new THREE.Color( 0x0077ff ) },
-        bottomColor: { value: new THREE.Color( 0xffffff ) },
-        offset: { value: 400 },
-        exponent: { value: 0.6 }
-    };
-    uniforms.topColor.value.copy( light.color );
+        uniforms: {
+            tExplosion: {
+            type: "t",
+            value: textureLoader.load( 'explosion.png' )
+            },
+            time: {
+            type: "f",
+            value: 0.0
+            }
+        },
+        vertexShader: document.getElementById( 'vertexShader' ).textContent,
+        fragmentShader: document.getElementById( 'fragmentShader' ).textContent
 
-    const skyGeo = new THREE.SphereGeometry( 4000, 32, 15 );
-    const skyMat = new THREE.ShaderMaterial( {
-        uniforms: uniforms,
-        vertexShader: vertexShader,
-        fragmentShader: fragmentShader,
-        side: THREE.BackSide
     } );
 
-    const sky = new THREE.Mesh( skyGeo, skyMat );
-    scene.add( sky );
+    mesh = new THREE.Mesh(
+        new THREE.IcosahedronGeometry( 50, 4 ),
+        material
+    );
+    scene.add( mesh );
 
-    // RENDERER
-
-    renderer = new THREE.WebGLRenderer( { antialias: true } );
+    renderer = new THREE.WebGLRenderer();
+    renderer.setSize( window.innerWidth, window.innerHeight );
     renderer.setPixelRatio( window.devicePixelRatio );
-    renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+
     container.appendChild( renderer.domElement );
-    renderer.outputEncoding = THREE.sRGBEncoding;
 
-    // CONTROLS
+    var controls = new OrbitControls( camera, renderer.domElement );
 
-    const controls = new OrbitControls( camera, renderer.domElement );
-    controls.maxPolarAngle = 0.9 * Math.PI / 2;
-    controls.enableZoom = false;
-
-    // MODEL
-
-    const loader = new THREE.ObjectLoader();
-    const object = await loader.loadAsync( './models/json/lightmap/lightmap.json' );
-    scene.add( object );
-
-    //
-
+    onWindowResize();
     window.addEventListener( 'resize', onWindowResize );
 
-}
+    render();
 
-function onWindowResize() {
+} );
 
+function onWindowResize () {
+
+    renderer.setSize( window.innerWidth, window.innerHeight );
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
 
-    renderer.setSize( window.innerWidth, window.innerHeight );
-
 }
 
-//
+function render() {
 
-function animate() {
-
-    requestAnimationFrame( animate );
+    material.uniforms[ 'time' ].value = 0; //.00025 * ( Date.now() - start );
 
     renderer.render( scene, camera );
-    stats.update();
+    requestAnimationFrame( render );
 
 }
