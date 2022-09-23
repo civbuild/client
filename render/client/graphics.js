@@ -26,27 +26,14 @@ async function load_shaders() {
     fragmentShader = await fetch('fragment_shader.glsl').then(result => result.text());
 }
 
-function init() {
+function add_objects(scene) {
 
-    container = document.getElementById( "container" );
-
-    scene = new THREE.Scene();
-
+    // add a house
     modelLoader.load( './models/small_house/scene.gltf', function ( gltf ) {
         scene.add(gltf.scene);
     }, undefined, function ( error ) {
         console.error( error );
     } );
-
-    camera = new THREE.PerspectiveCamera(
-        fov,
-        window.innerWidth / window.innerHeight,
-        1,
-        10000 );
-    camera.position.z = 500;
-
-    var light = new THREE.AmbientLight(0xffffff);
-    scene.add(light);
 
     // create material
     terrain_material = new THREE.ShaderMaterial( {
@@ -103,13 +90,39 @@ function init() {
 
     // position mesh
     explosion_mesh.position.set(0,50,0);
+}
 
+function add_lighting(scene) {
+    var light = new THREE.AmbientLight(0xffffff);
+    scene.add(light);
+}
+
+function init() {
+
+    // scene
+    scene = new THREE.Scene();
+    add_objects(scene);
+    add_lighting(scene);
+
+    // camera
+    camera = new THREE.PerspectiveCamera(
+        fov,
+        window.innerWidth / window.innerHeight,
+        1,
+        10000 );
+    camera.position.z = 500;
+
+    // camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
+    // camera.position.set( 0, .2, 0 );
+
+    // renderer
     renderer = new THREE.WebGLRenderer();
     renderer.setSize( window.innerWidth, window.innerHeight );
     renderer.setPixelRatio( window.devicePixelRatio );
-
+    container = document.getElementById( "container" );
     container.appendChild( renderer.domElement );
 
+    // conrols
     var controls = new OrbitControls( camera, renderer.domElement );
     controls.mouseButtons = {
         LEFT: THREE.MOUSE.ROTATE,
@@ -117,9 +130,11 @@ function init() {
         RIGHT: ''
     }
 
+    // window
     onWindowResize();
     window.addEventListener( 'resize', onWindowResize );
 
+    // start animations
     render();
 }
 
