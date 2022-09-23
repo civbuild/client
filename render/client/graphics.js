@@ -89,7 +89,7 @@ function add_objects(scene) {
     scene.add( explosion_mesh );
 
     // position mesh
-    explosion_mesh.position.set(0,50,0);
+    explosion_mesh.position.set(0,75,0);
 }
 
 function add_lighting(scene) {
@@ -105,15 +105,8 @@ function init() {
     add_lighting(scene);
 
     // camera
-    camera = new THREE.PerspectiveCamera(
-        fov,
-        window.innerWidth / window.innerHeight,
-        1,
-        10000 );
-    camera.position.z = 500;
-
-    // camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
-    // camera.position.set( 0, .2, 0 );
+    camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 1, 1000 );
+    camera.position.set( 25, 150, 25 );
 
     // renderer
     renderer = new THREE.WebGLRenderer();
@@ -152,9 +145,13 @@ function onWindowResize () {
 
 function render() {
 
+    // animate explosion
     explosion_material.uniforms[ 'time' ].value = 0.00025 * ( Date.now() - start );   
 
+    // look at explosion
+    camera.lookAt(explosion_mesh.position);
+
+    // render and render the next frame
     renderer.render( scene, camera );
     requestAnimationFrame( render );
-
 }
