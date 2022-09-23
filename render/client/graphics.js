@@ -18,7 +18,10 @@ textureLoader = new THREE.TextureLoader(),
 modelLoader = new GLTFLoader(),
 terrain_material,
 explosion_material,
+keys = {},
 start = Date.now(),
+sphere_rotation_speed_x = 0,
+sphere_rotation_speed_y = 0,
 fov = 30;
 
 async function load_shaders() {
@@ -89,7 +92,7 @@ function add_objects(scene) {
     scene.add( explosion_mesh );
 
     // position mesh
-    explosion_mesh.position.set(0,75,0);
+    explosion_mesh.position.set(0,50,0);
 }
 
 function add_lighting(scene) {
@@ -106,7 +109,7 @@ function init() {
 
     // camera
     camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 1, 1000 );
-    camera.position.set( 25, 150, 25 );
+    camera.position.set( 25, 100, 25 );
 
     // renderer
     renderer = new THREE.WebGLRenderer();
@@ -117,15 +120,27 @@ function init() {
 
     // conrols
     var controls = new OrbitControls( camera, renderer.domElement );
-    controls.mouseButtons = {
-        LEFT: THREE.MOUSE.ROTATE,
-        MIDDLE: THREE.MOUSE.DOLLY,
-        RIGHT: ''
-    }
+    controls.enableZoom = false;
+    controls.enableRotate = false;
+    controls.enablePan = false;
 
-    // window
+    // event listeners
     onWindowResize();
     window.addEventListener( 'resize', onWindowResize );
+
+    document.body.addEventListener( 'keydown', function(e) {
+    
+        var key = e.code.replace('Key', '').toLowerCase();
+        keys[ key ] = true;
+        
+    });
+
+    document.body.addEventListener( 'keyup', function(e) {
+    
+        var key = e.code.replace('Key', '').toLowerCase();
+        keys[ key ] = false;
+        
+    });
 
     // start animations
     render();
@@ -147,6 +162,23 @@ function render() {
 
     // animate explosion
     explosion_material.uniforms[ 'time' ].value = 0.00025 * ( Date.now() - start );   
+
+    // sphere rotation control
+    if ( keys.w )
+        sphere_rotation_speed_y += 0.01;
+    else if ( keys.s )
+        sphere_rotation_speed_y -= 0.01;
+
+    if ( keys.a )
+        sphere_rotation_speed_x += 0.01;
+    else if ( keys.d )
+        sphere_rotation_speed_x -= 0.01;
+
+    console.log(sphere_rotation_speed_x);
+
+    // sphere rotation animation
+    explosion_mesh.rotation.x += sphere_rotation_speed_x;
+    explosion_mesh.rotation.y += sphere_rotation_speed_y;
 
     // look at explosion
     camera.lookAt(explosion_mesh.position);
