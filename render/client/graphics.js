@@ -8,12 +8,16 @@ container,
 renderer,
 scene,
 camera,
-mesh,
+terrain_mesh,
+explosion_mesh,
+terrain_object,
+explosion_object,
 vertexShader,
 fragmentShader,
 textureLoader = new THREE.TextureLoader(),
 modelLoader = new GLTFLoader(),
-material,
+terrain_material,
+explosion_material,
 start = Date.now(),
 fov = 30;
 
@@ -44,7 +48,25 @@ function init() {
     var light = new THREE.AmbientLight(0xffffff);
     scene.add(light);
 
-    material = new THREE.ShaderMaterial( {
+    // create material
+    terrain_material = new THREE.ShaderMaterial( {
+
+        uniforms: {
+            tExplosion: {
+                type: "t",
+                value: textureLoader.load( 'terrain.png' )
+            },
+            time: {
+                type: "f",
+                value: 0.0
+            }
+        },
+        vertexShader: vertexShader,
+        fragmentShader: fragmentShader
+
+    } );
+
+    explosion_material = new THREE.ShaderMaterial( {
 
         uniforms: {
             tExplosion: {
@@ -61,11 +83,26 @@ function init() {
 
     } );
 
-    mesh = new THREE.Mesh(
-        new THREE.IcosahedronGeometry( 50, 20 ),
-        material
+    // create object
+    terrain_object = new THREE.IcosahedronGeometry( 50, 100 );
+
+    explosion_object = new THREE.IcosahedronGeometry( 10, 20 );
+
+    // create mesh
+    terrain_mesh = new THREE.Mesh(
+        terrain_object,
+        terrain_material
     );
-    scene.add( mesh );
+    scene.add( terrain_mesh );
+
+    explosion_mesh = new THREE.Mesh(
+        explosion_object,
+        explosion_material
+    );
+    scene.add( explosion_mesh );
+
+    // position mesh
+    explosion_mesh.position.set(0,50,0);
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize( window.innerWidth, window.innerHeight );
@@ -100,7 +137,7 @@ function onWindowResize () {
 
 function render() {
 
-    material.uniforms[ 'time' ].value = 0; //.00025 * ( Date.now() - start );   
+    explosion_material.uniforms[ 'time' ].value = 0.00025 * ( Date.now() - start );   
 
     renderer.render( scene, camera );
     requestAnimationFrame( render );
